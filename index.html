@@ -1,0 +1,117 @@
+<html>
+
+<head>
+    <title>Income</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@500&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Source Code Pro', monospace;
+            background-color: #235b6f;
+            color: #Bfbfc1;
+        }
+
+        #counter {
+            font-size: 120px;
+        }
+
+        button {
+            font-size: 2vw;
+            font-family: 'Source Code Pro', monospace;
+            padding: 1vw;
+            border: none;
+            border-radius: 1vw;
+            background-color: #Bfbfc1;
+            color: #235b6f;
+            cursor: pointer;
+        }
+
+        #app {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+        }
+
+        input {
+            font-size: 2vw;
+            font-family: 'Source Code Pro', monospace;
+            padding: 1vw;
+            border: none;
+            border-radius: 1vw;
+            background-color: #Bfbfc1;
+            color: #235b6f;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div id="start">
+            <h1>Input your wage in dollars per hour <br>(e.g. "13")</h1>
+            <input type="text" id="wage" value="13">
+            <button onclick="startCounter()">Start</button>
+
+        </div>
+        <div id="counter"></div>
+    </div>
+
+    <script>
+        let incomeSoFar = 0;
+        let wagePerHour;
+        const counter = document.getElementById('counter');
+        let newIncome = 0;
+        let intervalId = null;
+        let hiddenDate = null;
+        let wagePerTick;
+
+
+
+        const startCounter = () => {
+            const wageInput = document.querySelector('input');
+            wagePerHour = Number(wageInput.value) || 13;
+
+            document.querySelector('#start').remove();
+
+            // determine wage per tick (16.667ms)
+            wagePerTick = wagePerHour / 3600 / 60;
+            console.log(`Your calculated wage per hour is: ${wagePerTick * 3600 * 60}`);
+            console.log(wagePerTick);
+            startTimer();
+
+
+            // Add event listener for visibility change
+            document.addEventListener("visibilitychange", handleVisibilityChange);
+
+
+            // Handle visibility change
+            function handleVisibilityChange() {
+                if (document.hidden) {
+                    clearInterval(intervalId);
+                    hiddenDate = new Date();
+                } else {
+                    const now = new Date();
+                    const diff = now - hiddenDate;
+                    const diffSeconds = diff / 1000;
+                    incomeSoFar = incomeSoFar + (diffSeconds * 60 * wagePerTick);
+                    console.log(`Income made while inactive: ${incomeSoFar.toFixed(4)}`);
+                    startTimer();
+                }
+            }
+        }
+
+        function startTimer() {
+            intervalId = setInterval(() => {
+                incomeSoFar += wagePerTick;
+                newIncome = `$${incomeSoFar.toFixed(4)}`
+                counter.innerHTML = newIncome;
+                document.title = newIncome;
+            }, 16.66666667);
+        }
+    </script>
+
+</body>
